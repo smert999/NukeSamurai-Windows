@@ -12,16 +12,33 @@ if len(sys.argv) < 2:
 
 params = json.loads(sys.argv[1])
 
-# Добавляем sam2_repo в path
+# Добавляем sam2_repo в path (должен быть в PYTHONPATH от parent process)
 sam2_repo = params["sam2_repo"]
+sam2_repo = os.path.abspath(sam2_repo)
+
+# Ensure sam2_repo is in sys.path for imports
 if sam2_repo not in sys.path:
     sys.path.insert(0, sam2_repo)
 
+# Set Hydra full error for better debugging
+os.environ['HYDRA_FULL_ERROR'] = '1'
+
+print(f"[SAM2 Worker] sys.path includes: {sam2_repo}")
+print(f"[SAM2 Worker] Attempting to import sam2 module...")
+
 # Теперь импортируем torch и SAM2
-import torch
-import cv2
-import numpy as np
-from sam2.build_sam import build_sam2_video_predictor
+try:
+    import torch
+    import cv2
+    import numpy as np
+    from sam2.build_sam import build_sam2_video_predictor
+    print(f"[SAM2 Worker] Successfully imported sam2 module")
+except ImportError as e:
+    print(f"[SAM2 Worker] ERROR: Failed to import sam2 module: {e}", file=sys.stderr)
+    print(f"[SAM2 Worker] sam2_repo path: {sam2_repo}", file=sys.stderr)
+    print(f"[SAM2 Worker] Check that sam2_repo contains 'sam2' folder", file=sys.stderr)
+    sys.exit(1)
+
 # NO nuke imports - worker runs in system Python!
 
 print(f"[SAM2 Worker] torch {torch.__version__}, CUDA: {torch.cuda.is_available()}")

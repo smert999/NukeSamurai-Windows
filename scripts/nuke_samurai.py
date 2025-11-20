@@ -274,12 +274,26 @@ def GenerateMask():
     
     def run_worker():
         try:
+            # Prepare environment with sam2_repo in PYTHONPATH
+            env = os.environ.copy()
+            sam2_repo_path = os.path.join(os.path.dirname(worker_script), "..", "sam2_repo")
+            sam2_repo_path = os.path.abspath(sam2_repo_path)
+            
+            # Add sam2_repo to PYTHONPATH so Python can import sam2 module
+            if 'PYTHONPATH' in env:
+                env['PYTHONPATH'] = sam2_repo_path + os.pathsep + env['PYTHONPATH']
+            else:
+                env['PYTHONPATH'] = sam2_repo_path
+            
+            nuke.tprint(f"[SAMURAI] PYTHONPATH: {sam2_repo_path}")
+            
             process = subprocess.Popen(
                 [system_python, worker_script, params_json],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 text=True,
-                bufsize=1
+                bufsize=1,
+                env=env
             )
             
             renderProgress = nuke.ProgressTask('SAM2 Propagation (GPU)')
