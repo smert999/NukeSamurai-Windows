@@ -88,7 +88,7 @@ pip install torch==2.5.1+cu121 torchvision==0.20.1+cu121 --index-url https://dow
 pip install torch==2.5.1+cu118 torchvision==0.20.1+cu118 --index-url https://download.pytorch.org/whl/cu118
 ```
 
-### Шаг 3: Установка зависимостей
+### Шаг 3: Установка зависимостей для System Python
 
 **Вариант 1: Автоматическая установка (рекомендуется)**
 ```bash
@@ -102,6 +102,27 @@ pip install numpy opencv-python pillow tqdm hydra-core omegaconf iopath timm ein
 ```
 
 ⚠️ **Важно:** Все зависимости должны быть установлены в system Python, где установлен PyTorch!
+
+### Шаг 3.5: Установка OpenCV для Nuke Python (для Bounding Box)
+
+⚠️ **КРИТИЧЕСКИ ВАЖНО:** Для работы "Create Bounding Box" нужен opencv-python в **Nuke Python**!
+
+**Откройте PowerShell/CMD как Администратор:**
+
+Для Nuke 16.0v4:
+```bash
+"C:\Program Files\Nuke16.0v4\python.exe" -m pip install opencv-python numpy
+```
+
+Для Nuke 15.1:
+```bash
+"C:\Program Files\Nuke15.1v5\python.exe" -m pip install opencv-python numpy
+```
+
+**Проверка:**
+```bash
+"C:\Program Files\Nuke16.0v4\python.exe" -c "import cv2; print('OpenCV:', cv2.__version__)"
+```
 
 ### Шаг 4: Установка плагина
 
@@ -231,7 +252,25 @@ nuke.pluginAddPath('./NukeSamurai')
 
 ## 🔧 Устранение неполадок / Troubleshooting
 
-### "ModuleNotFoundError: No module named 'loguru'" (или другой модуль)
+### "ModuleNotFoundError: No module named 'numpy'" при Create Bounding Box
+
+**Проблема:** opencv-python и numpy не установлены в **Nuke Python**.
+
+**Важно:** Функция "Create Bounding Box" использует cv2.selectROI(), которая выполняется в Nuke Python, а не в subprocess!
+
+**Решение:** Установите opencv-python и numpy В NUKE PYTHON:
+
+```bash
+# Для Nuke 16.0v4:
+"C:\Program Files\Nuke16.0v4\python.exe" -m pip install opencv-python numpy
+
+# Для Nuke 15.1:
+"C:\Program Files\Nuke15.1v5\python.exe" -m pip install opencv-python numpy
+```
+
+⚠️ Требуются права администратора!
+
+### "ModuleNotFoundError: No module named 'loguru'" при Generate Mask
 
 **Проблема:** Не все зависимости SAM2 установлены в system Python.
 

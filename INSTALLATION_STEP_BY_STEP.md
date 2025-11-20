@@ -285,6 +285,104 @@ python check_dependencies.py
 
 ---
 
+# 🎨 ЧАСТЬ 3.5: Установка OpenCV в Nuke Python (для Bounding Box)
+
+⚠️ **КРИТИЧЕСКИ ВАЖНО!**
+
+Функция "Create Bounding Box" использует `cv2.selectROI()` для выбора области объекта.  
+Это GUI функция, которая выполняется **в Nuke Python**, а не в subprocess!
+
+Поэтому нужно установить opencv-python и numpy **В NUKE PYTHON**.
+
+---
+
+## Шаг 3.5.1: Найдите python.exe от Nuke
+
+Путь к python.exe зависит от версии Nuke:
+
+| Версия Nuke | Python | Путь |
+|-------------|--------|------|
+| Nuke 16.0v4 | Python 3.11 | `C:\Program Files\Nuke16.0v4\python.exe` |
+| Nuke 15.1v5 | Python 3.9 | `C:\Program Files\Nuke15.1v5\python.exe` |
+| Nuke 15.0 | Python 3.9 | `C:\Program Files\Nuke15.0\python.exe` |
+
+**Проверьте что файл существует:**
+```cmd
+dir "C:\Program Files\Nuke16.0v4\python.exe"
+```
+
+---
+
+## Шаг 3.5.2: Установите opencv-python и numpy
+
+⚠️ **Требуются права Администратора!**
+
+**Откройте PowerShell/CMD КАК АДМИНИСТРАТОР:**
+- Win+X → "Windows PowerShell (Admin)"
+- или Win+X → "Command Prompt (Admin)"
+
+**Для Nuke 16.0v4:**
+```cmd
+"C:\Program Files\Nuke16.0v4\python.exe" -m pip install opencv-python numpy
+```
+
+**Для Nuke 15.1v5:**
+```cmd
+"C:\Program Files\Nuke15.1v5\python.exe" -m pip install opencv-python numpy
+```
+
+**Ожидаемый вывод:**
+```
+Collecting opencv-python
+  Downloading opencv_python-4.10.0.84-cp39-cp39-win_amd64.whl
+Collecting numpy
+  Downloading numpy-1.26.4-cp39-cp39-win_amd64.whl
+Installing collected packages: numpy, opencv-python
+Successfully installed numpy-1.26.4 opencv-python-4.10.0.84
+```
+
+---
+
+## Шаг 3.5.3: Проверка Установки
+
+**Для Nuke 16.0v4:**
+```cmd
+"C:\Program Files\Nuke16.0v4\python.exe" -c "import cv2; print('OpenCV:', cv2.__version__)"
+```
+
+**Должно показать:**
+```
+OpenCV: 4.10.0
+```
+
+**Если ошибка:**
+- Проверьте что запускали cmd/PowerShell **КАК АДМИНИСТРАТОР**
+- Проверьте путь к python.exe
+- Попробуйте снова
+
+---
+
+## ⚙️ Почему Нужны ДВЕ Установки?
+
+┌─────────────────────────────────────────┐
+│ 1. SYSTEM PYTHON (3.10)                 │
+│    • torch, SAM2 dependencies           │
+│    • Для mask generation (subprocess)   │
+│    • Установка: pip install -r req.txt │
+├─────────────────────────────────────────┤
+│ 2. NUKE PYTHON (3.9/3.11)               │
+│    • opencv-python, numpy               │
+│    • Для Bounding Box GUI               │
+│    • Установка: Nuke\python.exe -m pip  │
+└─────────────────────────────────────────┘
+
+**Subprocess изоляция продолжает работать!**
+- torch остается в subprocess (system Python)
+- opencv в Nuke Python только для GUI
+- Никаких конфликтов!
+
+---
+
 # 🎨 ЧАСТЬ 4: Установка NukeSamurai Плагина
 
 ## Шаг 4.1: Скачайте Плагин

@@ -103,7 +103,7 @@ CUDA: True
 
 ---
 
-### Шаг 4: Установка зависимостей
+### Шаг 4: Установка зависимостей для System Python
 
 **Автоматически (рекомендуется):**
 ```cmd
@@ -121,6 +121,27 @@ pip install numpy opencv-python pillow tqdm hydra-core omegaconf iopath timm ein
 **Проверьте**:
 ```cmd
 pip list | findstr "opencv numpy pillow tqdm hydra loguru timm einops"
+```
+
+### Шаг 4.5: Установка OpenCV для Nuke Python (для Bounding Box)
+
+⚠️ **КРИТИЧЕСКИ ВАЖНО:** Для работы "Create Bounding Box" нужен opencv-python в **Nuke Python**!
+
+**Откройте CMD/PowerShell как Администратор:**
+
+Для Nuke 16.0v4:
+```cmd
+"C:\Program Files\Nuke16.0v4\python.exe" -m pip install opencv-python numpy
+```
+
+Для Nuke 15.1:
+```cmd
+"C:\Program Files\Nuke15.1v5\python.exe" -m pip install opencv-python numpy
+```
+
+**Проверка:**
+```cmd
+"C:\Program Files\Nuke16.0v4\python.exe" -c "import cv2; print(cv2.__version__)"
 ```
 
 ---

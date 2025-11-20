@@ -1,4 +1,14 @@
 # NukeSamurai - Required Python Packages
+# 
+# IMPORTANT: This file is for SYSTEM PYTHON packages (for SAM2 inference in subprocess)
+# 
+# Additionally, you need to install opencv-python and numpy in NUKE PYTHON:
+#   "C:\Program Files\Nuke16.0v4\python.exe" -m pip install opencv-python numpy
+# 
+# Why two installations?
+#   - System Python: torch, SAM2 dependencies (for mask generation via subprocess)
+#   - Nuke Python: opencv-python, numpy (for Bounding Box GUI with cv2.selectROI)
+
 # Install with: pip install -r requirements.txt
 
 # PyTorch with CUDA (choose one based on your CUDA version)
