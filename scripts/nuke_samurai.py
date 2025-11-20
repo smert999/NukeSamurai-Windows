@@ -273,13 +273,57 @@ def GenerateMask():
                         is_sequence = any(pattern in output_path_png for pattern in ["%04d", "%03d", "####", "###"])
                         
                         if is_sequence:
+                            # Get current node for frame range
+                            current_node = nuke.thisNode()
+                            frame_min = int(current_node.knob('FrameRangeMin').value())
+                            frame_max = int(current_node.knob('FrameRangeMax').value())
+                            
+                            # Verify first frame exists
+                            first_frame_path = output_path_png
+                            if "%04d" in output_path_png:
+                                first_frame_path = output_path_png.replace('%04d', f"{frame_min:04}")
+                            elif "%03d" in output_path_png:
+                                first_frame_path = output_path_png.replace('%03d', f"{frame_min:03}")
+                            
+                            if not os.path.exists(first_frame_path):
+                                nuke.tprint(f"[SAMURAI] ⚠️ First frame not found: {first_frame_path}")
+                                nuke.tprint(f"[SAMURAI] ℹ️  Masks path: {output_path_png}")
+                                return
+                            
+                            # Create Read node with proper settings
                             read_node = nuke.nodes.Read(file=output_path_png)
+                            
+                            # Set frame range
+                            read_node['first'].setValue(frame_min)
+                            read_node['last'].setValue(frame_max)
+                            read_node['origfirst'].setValue(frame_min)
+                            read_node['origlast'].setValue(frame_max)
+                            
+                            # Set colorspace to linear (masks are linear data)
+                            try:
+                                read_node['colorspace'].setValue('linear')
+                            except:
+                                # If OCIO, try 'Linear' or 'Utility - Linear - sRGB'
+                                try:
+                                    read_node['colorspace'].setValue('Linear')
+                                except:
+                                    try:
+                                        read_node['colorspace'].setValue('Utility - Linear - sRGB')
+                                    except:
+                                        nuke.tprint(f"[SAMURAI] ⚠️ Could not set colorspace, using default")
+                            
+                            # Position node
                             read_node.setXYpos(node_x + 200, node_y)
+                            
                             nuke.tprint(f"[SAMURAI] ✅ Read node created: {output_path_png}")
+                            nuke.tprint(f"[SAMURAI] ℹ️  Frame range: {frame_min}-{frame_max}")
+                            nuke.tprint(f"[SAMURAI] ℹ️  Colorspace: {read_node['colorspace'].value()}")
                         else:
                             nuke.tprint(f"[SAMURAI] ⚠️ Read node not created: output must be image sequence (use %04d or ####)")
                     except Exception as e:
                         nuke.tprint(f"[SAMURAI] ⚠️ Could not create Read node: {e}")
+                        import traceback
+                        nuke.tprint(traceback.format_exc())
                 
                 nuke.executeInMainThread(create_read_node)
                 
