@@ -87,9 +87,11 @@ After (GPU RTX 4090): **15-20 seconds** for 181 frames ⚡
 - ✅ **Используется ваш рабочий system Python** с torch+CUDA
 
 **Что устанавливается:**
-1. **System Python (3.10/3.11)**: torch, SAM2, все зависимости
+1. **System Python (3.10/3.11)**: torch + зависимости SAM2 (hydra, omegaconf, timm, einops, loguru)
 2. **Nuke Python (3.9/3.11)**: только opencv-python + numpy (для GUI bbox)
-3. **Плагин**: только скрипты, NO libraries!
+3. **Плагин**: скрипты + SAM2 код (sam2_repo уже включен в релиз!)
+
+💡 **Важно:** Код SAM2 **не устанавливается через pip** - он уже включен в папку `sam2_repo`!
 
 **English:**
 
@@ -103,9 +105,11 @@ This plugin uses **subprocess architecture** for complete PyTorch isolation from
 - ✅ **Uses your working system Python** with torch+CUDA
 
 **What gets installed:**
-1. **System Python (3.10/3.11)**: torch, SAM2, all dependencies
+1. **System Python (3.10/3.11)**: torch + SAM2 dependencies (hydra, omegaconf, timm, einops, loguru)
 2. **Nuke Python (3.9/3.11)**: only opencv-python + numpy (for GUI bbox)
-3. **Plugin**: only scripts, NO libraries!
+3. **Plugin**: scripts + SAM2 code (sam2_repo already included in release!)
+
+💡 **Important:** SAM2 code is **not installed via pip** - it's already included in `sam2_repo` folder!
 
 ---
 
