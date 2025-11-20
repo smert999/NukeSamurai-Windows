@@ -4,6 +4,8 @@ import threading
 import gc
 import subprocess
 import json
+import shutil
+import sys
 
 # NO torch or cv2 imports - using subprocess with system Python instead!
 # cv2 is imported locally in getBbox() function
@@ -205,11 +207,66 @@ def GenerateMask():
     
     params_json = json.dumps(params)
     
-    # Start subprocess worker
-    system_python = r"C:\Users\nfspr\AppData\Local\Programs\Python\Python310\python.exe"
+    # Find system Python automatically
+    # Method 0: Check environment variable first (for advanced users)
+    system_python = os.getenv('SAMURAI_PYTHON')
+    
+    if not system_python or not os.path.exists(system_python):
+        # Method 1: Try 'python' in PATH
+        python_cmd = shutil.which('python')
+        if python_cmd:
+            try:
+                # Check if it's Python 3.10 or 3.11
+                result = subprocess.run([python_cmd, '--version'], capture_output=True, text=True, timeout=5)
+                version_output = result.stdout + result.stderr
+                if 'Python 3.10' in version_output or 'Python 3.11' in version_output:
+                    system_python = python_cmd
+            except:
+                pass
+        
+        # Method 2: Try 'python3' in PATH
+        if not system_python:
+            python3_cmd = shutil.which('python3')
+            if python3_cmd:
+                try:
+                    result = subprocess.run([python3_cmd, '--version'], capture_output=True, text=True, timeout=5)
+                    version_output = result.stdout + result.stderr
+                    if 'Python 3.10' in version_output or 'Python 3.11' in version_output:
+                        system_python = python3_cmd
+                except:
+                    pass
+        
+        # Method 3: Try common installation paths
+        if not system_python:
+            username = os.getenv('USERNAME', 'User')
+            common_paths = [
+                rf"C:\Users\{username}\AppData\Local\Programs\Python\Python310\python.exe",
+                rf"C:\Users\{username}\AppData\Local\Programs\Python\Python311\python.exe",
+                r"C:\Python310\python.exe",
+                r"C:\Python311\python.exe",
+                r"C:\Program Files\Python310\python.exe",
+                r"C:\Program Files\Python311\python.exe",
+                r"C:\Program Files (x86)\Python310\python.exe",
+                r"C:\Program Files (x86)\Python311\python.exe",
+            ]
+            for path in common_paths:
+                if os.path.exists(path):
+                    system_python = path
+                    break
+    
+    # If still not found, show error
+    if not system_python:
+        error_msg = "Python 3.10/3.11 not found!\n\n"
+        error_msg += "Please install Python 3.10 or 3.11 and add it to PATH:\n"
+        error_msg += "https://www.python.org/downloads/\n\n"
+        error_msg += "Or set SAMURAI_PYTHON environment variable:\n"
+        error_msg += "set SAMURAI_PYTHON=C:\\Python310\\python.exe"
+        nuke.message(error_msg)
+        return
     
     nuke.tprint("[SAMURAI] Starting SAM2 inference via system Python...")
-    nuke.tprint(f"[SAMURAI] Using GPU: torch with CUDA in Python 3.10")
+    nuke.tprint(f"[SAMURAI] Found Python: {system_python}")
+    nuke.tprint(f"[SAMURAI] Using GPU: torch with CUDA")
     
     # Save node position for Read node creation
     node_x = nuke.thisNode().xpos()
