@@ -21,8 +21,9 @@ NukeSamurai - это адаптированная версия плагина д
 - ✅ Работает на **Windows** (решены все проблемы совместимости)
 - ✅ **Subprocess архитектура** (обходит конфликты DLL между Nuke Python и PyTorch)
 - ✅ Автоматическое создание Read ноды с масками
-- ✅ Прогресс-бар в реальном времени
-- ✅ Поддержка PNG, EXR, MP4
+- ✅ Прогресс-бар в реальном времени с детализацией этапов
+- ✅ Поддержка PNG, EXR (с автоматическим fallback), MP4
+- ✅ OCIO colorspace поддержка
 
 **English:**
 
@@ -34,8 +35,9 @@ NukeSamurai is an adapted version of the Nuke plugin that generates object masks
 - ✅ Works on **Windows** (all compatibility issues resolved)
 - ✅ **Subprocess architecture** (bypasses DLL conflicts between Nuke Python and PyTorch)
 - ✅ Automatic Read node creation with masks
-- ✅ Real-time progress bar
-- ✅ PNG, EXR, MP4 support
+- ✅ Real-time progress bar with detailed stages
+- ✅ PNG, EXR (with automatic fallback), MP4 support
+- ✅ OCIO colorspace support
 
 ---
 
@@ -155,10 +157,15 @@ nuke.pluginAddPath('./NukeSamurai')
 
 - **Model type**: Base+ (рекомендуется для RTX 4090)
 - **Frame Range**: 1001 - 1182 (автоматически)
-- **File type**: png (по умолчанию)
+- **File type**: 
+  - **png** (рекомендуется, всегда работает) ✅
+  - **exr** (автоматически переключится на PNG если OpenCV не поддерживает)
+  - **mp4** (пока не реализовано)
 - **Output Path**: `D:/path/to/Mask_####.png`
 
 ⚠️ **Важно:** Output Path должен содержать `####` или `###`
+
+💡 **Tip:** Наведите курсор на "File type" чтобы увидеть подсказку о форматах
 
 ### 5. Generate Mask
 
@@ -237,7 +244,13 @@ python -c "import torch; print(torch.__version__, torch.cuda.is_available())"
 
 ### "OpenCV cannot write EXR"
 
-OpenCV на Windows не поддерживает EXR. Используйте **PNG** (рекомендуется) или MP4.
+OpenCV на Windows не поддерживает EXR по умолчанию.
+
+**Решение:**
+- Плагин **автоматически** переключится на PNG при выборе EXR
+- Вы увидите предупреждение: `WARNING: EXR not supported by OpenCV, using PNG`
+- Read нода создастся с правильным PNG путём
+- **Рекомендация:** Используйте PNG сразу (идеально для масок)
 
 ### Медленная генерация
 
@@ -248,6 +261,23 @@ OpenCV на Windows не поддерживает EXR. Используйте **
 ---
 
 ## 📝 Changelog
+
+### [1.1.0] - 2025-01-21
+
+#### Added
+- ✅ **EXR automatic fallback** to PNG when OpenCV doesn't support EXR
+- ✅ **Tooltip in UI** explaining file format support
+- ✅ **Detailed progress stages** (Loading Model, Reading Frames, Detecting Object, Propagating)
+- ✅ **OCIO colorspace support** for Read node (Linear/Utility - Linear - sRGB)
+- ✅ **OpenEXR environment variable** support (OPENCV_IO_ENABLE_OPENEXR=1)
+
+#### Fixed
+- ✅ **Read node creation context issue** (nuke.thisNode() in executeInMainThread)
+- ✅ **EXR fallback path reporting** (worker now sends correct PNG path to Nuke)
+- ✅ **Read node frame range** auto-configuration (first/last/origfirst/origlast)
+- ✅ **Read node file existence check** before creation
+- ✅ **Progress bar accuracy** (correct total_frames calculation)
+- ✅ **cv2 import error** on Nuke startup (moved to local import in getBbox)
 
 ### [1.0.0] - 2025-01-20
 
