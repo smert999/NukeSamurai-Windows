@@ -105,13 +105,22 @@ CUDA: True
 
 ### Шаг 4: Установка зависимостей
 
+**Автоматически (рекомендуется):**
 ```cmd
-pip install opencv-contrib-python numpy pillow tqdm hydra-core
+cd %USERPROFILE%\.nuke\NukeSamurai
+pip install -r requirements.txt
 ```
+
+**Или вручную:**
+```cmd
+pip install numpy opencv-python pillow tqdm hydra-core omegaconf iopath timm einops loguru
+```
+
+⚠️ **Важно:** Все зависимости должны быть установлены в system Python, где установлен PyTorch!
 
 **Проверьте**:
 ```cmd
-pip list | findstr "opencv numpy pillow tqdm hydra"
+pip list | findstr "opencv numpy pillow tqdm hydra loguru timm einops"
 ```
 
 ---
@@ -332,13 +341,22 @@ CUDA: True
 
 ### Step 4: Install Dependencies
 
+**Automatic (recommended):**
 ```cmd
-pip install opencv-contrib-python numpy pillow tqdm hydra-core
+cd %USERPROFILE%\.nuke\NukeSamurai
+pip install -r requirements.txt
 ```
+
+**Or manually:**
+```cmd
+pip install numpy opencv-python pillow tqdm hydra-core omegaconf iopath timm einops loguru
+```
+
+⚠️ **Important:** All dependencies must be installed in the same system Python where PyTorch is installed!
 
 **Verify**:
 ```cmd
-pip list | findstr "opencv numpy pillow tqdm hydra"
+pip list | findstr "opencv numpy pillow tqdm hydra loguru timm einops"
 ```
 
 ---

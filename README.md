@@ -90,9 +90,18 @@ pip install torch==2.5.1+cu118 torchvision==0.20.1+cu118 --index-url https://dow
 
 ### Шаг 3: Установка зависимостей
 
+**Вариант 1: Автоматическая установка (рекомендуется)**
 ```bash
-pip install opencv-contrib-python numpy pillow tqdm hydra-core
+cd %USERPROFILE%\.nuke\NukeSamurai
+pip install -r requirements.txt
 ```
+
+**Вариант 2: Ручная установка**
+```bash
+pip install numpy opencv-python pillow tqdm hydra-core omegaconf iopath timm einops loguru
+```
+
+⚠️ **Важно:** Все зависимости должны быть установлены в system Python, где установлен PyTorch!
 
 ### Шаг 4: Установка плагина
 
@@ -222,6 +231,26 @@ nuke.pluginAddPath('./NukeSamurai')
 
 ## 🔧 Устранение неполадок / Troubleshooting
 
+### "ModuleNotFoundError: No module named 'loguru'" (или другой модуль)
+
+**Проблема:** Не все зависимости SAM2 установлены в system Python.
+
+**Решение:**
+```bash
+cd %USERPROFILE%\.nuke\NukeSamurai
+pip install -r requirements.txt
+```
+
+Или установите недостающий модуль:
+```bash
+pip install loguru
+```
+
+**Проверьте все зависимости:**
+```bash
+pip list | findstr "torch numpy opencv hydra loguru timm einops"
+```
+
 ### "Worker failed with code 1"
 
 Проверьте консоль Nuke (F8) для деталей ошибки.
@@ -230,12 +259,19 @@ nuke.pluginAddPath('./NukeSamurai')
 1. PyTorch не установлен в system Python
 2. CUDA Toolkit не установлен
 3. Неправильная версия torch (нужна +cu118 или +cu121)
+4. Не установлены зависимости SAM2 (loguru, timm, einops и др.)
 
 **Решение:**
 ```bash
 python -c "import torch; print(torch.__version__, torch.cuda.is_available())"
 ```
 Должно быть: `2.5.1+cu121 True`
+
+Если проблема с зависимостями:
+```bash
+cd %USERPROFILE%\.nuke\NukeSamurai
+pip install -r requirements.txt
+```
 
 ### "Frame range error"
 
