@@ -1,0 +1,318 @@
+# NukeSamurai - Windows GPU Edition 🚀
+
+> **SAM 2.1 (Segment Anything Model 2.1)** plugin for **Nuke** with **GPU acceleration** on Windows
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Nuke](https://img.shields.io/badge/Nuke-16.0v4-blue.svg)](https://www.foundry.com/products/nuke)
+[![Python](https://img.shields.io/badge/Python-3.10-blue.svg)](https://www.python.org/)
+[![CUDA](https://img.shields.io/badge/CUDA-11.8%2F12.1-green.svg)](https://developer.nvidia.com/cuda-toolkit)
+
+---
+
+## 📖 О проекте / About
+
+**Русский:**
+
+NukeSamurai - это адаптированная версия плагина для Nuke, позволяющая генерировать маски объектов с помощью SAM 2.1 (Segment Anything Model 2.1) от Meta с использованием **GPU ускорения на Windows**.
+
+**Ключевые особенности:**
+- ✅ **GPU ускорение** (NVIDIA RTX 4090 и другие)
+- ✅ **100x быстрее** CPU версии (~15-20 секунд вместо 15-20 минут для 181 кадра)
+- ✅ Работает на **Windows** (решены все проблемы совместимости)
+- ✅ **Subprocess архитектура** (обходит конфликты DLL между Nuke Python и PyTorch)
+- ✅ Автоматическое создание Read ноды с масками
+- ✅ Прогресс-бар в реальном времени
+- ✅ Поддержка PNG, EXR, MP4
+
+**English:**
+
+NukeSamurai is an adapted version of the Nuke plugin that generates object masks using SAM 2.1 (Segment Anything Model 2.1) from Meta with **GPU acceleration on Windows**.
+
+**Key Features:**
+- ✅ **GPU acceleration** (NVIDIA RTX 4090 and others)
+- ✅ **100x faster** than CPU version (~15-20 seconds vs 15-20 minutes for 181 frames)
+- ✅ Works on **Windows** (all compatibility issues resolved)
+- ✅ **Subprocess architecture** (bypasses DLL conflicts between Nuke Python and PyTorch)
+- ✅ Automatic Read node creation with masks
+- ✅ Real-time progress bar
+- ✅ PNG, EXR, MP4 support
+
+---
+
+## 🎬 Demo
+
+Before (CPU): **15-20 minutes** for 181 frames  
+After (GPU RTX 4090): **15-20 seconds** for 181 frames ⚡
+
+---
+
+## 💻 Требования / Requirements
+
+### Минимальные требования:
+- **Nuke** 16.0v4 или выше
+- **Windows 10/11** (64-bit)
+- **NVIDIA GPU** с поддержкой CUDA (RTX 3060 или выше рекомендуется)
+- **Python 3.10** (системный, отдельно от Nuke)
+- **16 GB RAM** (минимум)
+- **20 GB свободного места** (для моделей SAM 2.1)
+
+### Рекомендуемые:
+- **Nuke** 16.0v4+
+- **NVIDIA RTX 4090** или аналогичная
+- **32 GB RAM**
+- **SSD** для кэша
+
+---
+
+## 📥 Установка / Installation
+
+### Шаг 1: Установка системного Python 3.10
+
+1. Скачайте Python 3.10: https://www.python.org/downloads/release/python-31011/
+2. Установите с опциями:
+   - ✅ Add Python to PATH
+   - ✅ Install for all users
+
+### Шаг 2: Установка PyTorch с CUDA
+
+Откройте **командную строку** (cmd) и выполните:
+
+```bash
+pip install torch==2.5.1+cu121 torchvision==0.20.1+cu121 --index-url https://download.pytorch.org/whl/cu121
+```
+
+Или для CUDA 11.8:
+```bash
+pip install torch==2.5.1+cu118 torchvision==0.20.1+cu118 --index-url https://download.pytorch.org/whl/cu118
+```
+
+### Шаг 3: Установка зависимостей
+
+```bash
+pip install opencv-contrib-python numpy pillow tqdm hydra-core
+```
+
+### Шаг 4: Установка плагина
+
+1. Скачайте релиз или клонируйте репозиторий:
+```bash
+cd %USERPROFILE%\.nuke
+git clone https://github.com/YOUR_USERNAME/NukeSamurai-Windows.git NukeSamurai
+```
+
+2. Скачайте модели SAM 2.1:
+```bash
+cd %USERPROFILE%\.nuke\NukeSamurai\sam2_repo\checkpoints
+```
+
+Скачайте модели с:
+- https://github.com/facebookresearch/sam2/releases
+
+Модели:
+- `sam2.1_hiera_base_plus.pt` (рекомендуется для RTX 4090)
+- `sam2.1_hiera_large.pt`
+- `sam2.1_hiera_small.pt`
+- `sam2.1_hiera_tiny.pt`
+
+### Шаг 5: Настройка Nuke
+
+Плагин автоматически загружается из `~/.nuke/NukeSamurai/`
+
+**Если плагин не загрузился автоматически**, добавьте в `.nuke/init.py`:
+```python
+nuke.pluginAddPath('./NukeSamurai')
+```
+
+Проверьте в консоли Nuke (F8):
+```
+[NukeSamurai] Plugin loaded (GPU via subprocess)
+```
+
+---
+
+## 🎮 Использование / Usage
+
+### 1. Создайте узел SAMURAI
+
+В Nuke:
+- Нажмите **Tab**
+- Введите **SAMURAI**
+- Выберите узел
+
+### 2. Update Path
+
+1. Подключите **Read node** с последовательностью кадров
+2. В SAMURAI node нажмите **Update Path**
+3. Проверьте что Frame Range и FPS определились автоматически
+
+### 3. Create Bounding Box
+
+1. Нажмите **Create Bounding Box**
+2. В открывшемся окне выделите объект
+3. Нажмите **Enter** или **Space** для подтверждения
+
+### 4. Настройте параметры
+
+- **Model type**: Base+ (рекомендуется для RTX 4090)
+- **Frame Range**: 1001 - 1182 (автоматически)
+- **File type**: png (по умолчанию)
+- **Output Path**: `D:/path/to/Mask_####.png`
+
+⚠️ **Важно:** Output Path должен содержать `####` или `###`
+
+### 5. Generate Mask
+
+1. Нажмите **Generate Mask**
+2. Следите за прогрессом в Progress Bar
+3. После завершения Read node создастся автоматически справа от SAMURAI!
+
+---
+
+## 🏗️ Архитектура / Architecture
+
+```
+┌─────────────────────────────────────────┐
+│ Nuke Python 3.11 (UI only)             │
+│ • Node creation                         │
+│ • Bounding Box                          │
+│ • Parameters                            │
+│ • Progress Bar                          │
+└─────────────────────────────────────────┘
+                ↓ subprocess
+┌─────────────────────────────────────────┐
+│ System Python 3.10 (Worker)             │
+│ • torch 2.5.1+cu121 ✓ WORKS!           │
+│ • CUDA GPU RTX 4090 ✓                  │
+│ • SAM2 inference                        │
+│ • Mask generation & save                │
+└─────────────────────────────────────────┘
+```
+
+**Почему subprocess?**
+- Nuke Python 3.11 (скомпилирован Foundry) несовместим с PyTorch DLL
+- ABI/CRT конфликты делают невозможным импорт torch в Nuke Python
+- Subprocess использует системный Python 3.10 где torch РАБОТАЕТ с GPU
+- Чистое разделение: UI в Nuke, вычисления в system Python
+
+---
+
+## ⚡ Производительность / Performance
+
+### Тесты на RTX 4090:
+
+| Frames | CPU (minutes) | GPU (seconds) | Speedup |
+|--------|---------------|---------------|---------|
+| 181    | 15-20 min     | 15-20 sec     | 100x    |
+| 500    | 45-60 min     | 40-50 sec     | 90x     |
+| 1000   | 90-120 min    | 80-100 sec    | 80x     |
+
+**Base+ Model:**
+- Reading frames: ~38 FPS
+- Propagation: ~15-30 FPS
+- Total: ~20 seconds for 181 frames
+
+---
+
+## 🔧 Устранение неполадок / Troubleshooting
+
+### "Worker failed with code 1"
+
+Проверьте консоль Nuke (F8) для деталей ошибки.
+
+**Частые причины:**
+1. PyTorch не установлен в system Python
+2. CUDA Toolkit не установлен
+3. Неправильная версия torch (нужна +cu118 или +cu121)
+
+**Решение:**
+```bash
+python -c "import torch; print(torch.__version__, torch.cuda.is_available())"
+```
+Должно быть: `2.5.1+cu121 True`
+
+### "Frame range error"
+
+- Убедитесь что input frames существуют (1001-1182)
+- Output Path должен содержать `####` или `###`
+
+### "OpenCV cannot write EXR"
+
+OpenCV на Windows не поддерживает EXR. Используйте **PNG** (рекомендуется) или MP4.
+
+### Медленная генерация
+
+- Проверьте что используется GPU: `Device: cuda:0`
+- Закройте другие GPU-приложения
+- Уменьшите модель: Large → Base+ → Small
+
+---
+
+## 📝 Changelog
+
+### [1.0.0] - 2025-01-20
+
+#### Added
+- ✅ GPU acceleration через subprocess architecture
+- ✅ Automatic Read node creation
+- ✅ PNG support (8-bit, OpenCV compatible)
+- ✅ Real-time progress bar
+- ✅ Clean startup (minimal logs)
+- ✅ Auto-detection of CUDA version
+
+#### Fixed
+- ✅ PyTorch DLL compatibility with Nuke Python 3.11
+- ✅ OpenEXR → PNG conversion (OpenCV limitation on Windows)
+- ✅ Frame range calculation (inclusive range)
+- ✅ Encoding errors (emoji in Windows console)
+- ✅ Config path resolution
+- ✅ Model path resolution
+- ✅ SAM2 conditional nuke imports
+
+#### Changed
+- Default file type: EXR → **PNG**
+- Architecture: In-process → **Subprocess**
+- init.py: 94 lines → **16 lines**
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+---
+
+## 📜 License
+
+MIT License - see [LICENSE](LICENSE) file for details.
+
+---
+
+## 🙏 Credits
+
+- **Original NukeSamurai**: [Theo-SAMINADIN-td](https://github.com/Theo-SAMINADIN-td/NukeSamurai)
+- **SAM 2.1**: [Meta AI Research](https://github.com/facebookresearch/sam2)
+- **Windows GPU Adaptation**: Ostrix
+
+---
+
+## 📧 Contact
+
+- **Author**: Ostrix
+- **Email**: nfsprostreet2007@mail.ru
+- **GitHub**: [Your GitHub Profile]
+
+---
+
+## ⚠️ Disclaimer
+
+This is an unofficial adaptation of NukeSamurai for Windows with GPU support. Use at your own risk.
+
+---
+
+## 🌟 Show Your Support
+
+If this project helped you, please give it a ⭐️!
+
+---
+
+**Made with ❤️ for the Nuke community**

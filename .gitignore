@@ -1,0 +1,90 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyTorch models (слишком большие для git)
+checkpoints/*.pt
+*.pth
+*.ckpt
+
+# Nuke
+*.nk~
+*.nk#
+*.nk.autosave
+.nuke/
+
+# Cache
+*.cache
+.cache/
+__MACOSX/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Test outputs
+test_output/
+output/
+out_mask/
+
+# DLL (не нужны в репозитории)
+*.dll
+
+# Diagnostic scripts (временные)
+diagnose_*.py
+test_*.py
+
+# Documentation temporaries
+*.txt~
+
+# PyTorch libraries (пользователь устанавливает сам)
+python_libs/torch/
+python_libs/torchvision/
+python_libs/numpy/
+python_libs/cv2/
+python_libs/PIL/
+
+# Keep structure but ignore contents
+python_libs/*
+!python_libs/.gitkeep
+
+# SAM2 repo (клонируется отдельно или включается как submodule)
+# Раскомментируйте если хотите включить sam2_repo:
+# sam2_repo/
+
+# Compiled
+*.pyc
