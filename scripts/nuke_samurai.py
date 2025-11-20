@@ -32,13 +32,10 @@ class BoundingBox :
         
         input_file_name = str(os.path.splitext(os.path.basename(file_path))[0])
         
-        # Use Reference Frame instead of FrameRangeMin
-        reference_frame = int(nuke.thisNode().knob('ReferenceFrame').value())
-        
         if "%04d" in input_file_name :
-          file_path = file_path.replace('%04d', str(f"{reference_frame:04}")) 
+          file_path = file_path.replace('%04d', str(f"{int(nuke.thisNode().knob('FrameRangeMin').value()):04}")) 
         elif "%03d" in input_file_name :
-          file_path =  file_path.replace('%03d', str(f"{reference_frame:03}"))    
+          file_path =  file_path.replace('%03d', str(f"{int(nuke.thisNode().knob('FrameRangeMin').value()):03}"))    
 
         cls.input_path = file_path
         img_path = cls.input_path
@@ -322,11 +319,6 @@ def CreateSamuraiNode():
     s.knob('name').setValue('SAMURAI')
     s.addKnob(nuke.File_Knob('FilePath', 'File Path'))
     s.addKnob(nuke.PyScript_Knob('UpdatePath', 'Update Path', 'UpdatePath()' ))
-    
-    s.addKnob(nuke.Text_Knob(''))
-    
-    # Reference Frame для разметки объекта
-    s.addKnob(nuke.Int_Knob("ReferenceFrame", 'Reference Frame'))
     s.addKnob(nuke.PyScript_Knob('CreateBoundingBox', 'Create Bounding Box', 'BoundingBox.getBbox()'))
    
     s.addKnob(nuke.Text_Knob(''))
@@ -349,17 +341,14 @@ def CreateSamuraiNode():
     s['FPS'].setValue(int(nuke.root().knob('fps').getValue()))
     s['FrameRangeMin'].setValue(int(nuke.Root()['first_frame'].value())) 
     s['FrameRangeMax'].setValue(int(nuke.Root()['last_frame'].value())) 
-    s['ReferenceFrame'].setValue(int(nuke.Root()['first_frame'].value()))  # Default to first frame
 
 
     s['FPS'].setFlag(nuke.STARTLINE)
     s['FrameRangeMax'].clearFlag(nuke.STARTLINE)
     s['UpdatePath'].setFlag(nuke.STARTLINE)
-    s['ReferenceFrame'].setFlag(nuke.STARTLINE)
     s['GenerateMask'].setFlag(nuke.STARTLINE)
     
-    s['ReferenceFrame'].setTooltip("Frame number where you want to mark the object (can be any frame within Frame Range)")
-    s['CreateBoundingBox'].setTooltip("Create a bounding box on the Reference Frame. Press Enter or space to validate. Press C to cancel.")
+    s['CreateBoundingBox'].setTooltip("Create a bounding box. Press Enter or space to validate. Press C to cancel.")
     s['FPS'].setTooltip("Target FPS for the output video")
     s['ModelType'].setTooltip("Choose your model type")
     s['OutputPath'].setTooltip("path/to/your/file_####.exr, to create an image sequence add #### or ### ")

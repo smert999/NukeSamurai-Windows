@@ -31,7 +31,6 @@ video_path = params["video_path"]
 output_path = params["output_path"].replace('.exr', '.png')  # OpenCV не поддерживает EXR, используем PNG
 bbox_coord = params["bbox_coord"]
 frame_range = params["frame_range"]
-reference_frame_idx = params.get("reference_frame_idx", 0)  # Default to 0 (first frame) if not provided
 model_path = os.path.join(params["sam2_repo"], params["model_path"])  # checkpoints inside sam2_repo!
 fps_original = params["fps_original"]
 fps_target = params["fps_target"]
@@ -81,10 +80,8 @@ try:
             bits=bits
         )
         
-        ref_frame_num = frame_range[0] + reference_frame_idx
-        print(f"STAGE:Detecting Object on Frame {ref_frame_num}...")
-        print(f"[SAM2 Worker] Using reference frame: {ref_frame_num} (index {reference_frame_idx} in sequence)")
-        _, _, masks = predictor.add_new_points_or_box(state, box=bbox, frame_idx=reference_frame_idx, obj_id=0)
+        print("STAGE:Detecting Object...")
+        _, _, masks = predictor.add_new_points_or_box(state, box=bbox, frame_idx=0, obj_id=0)
     
     # Получаем размеры изображения
     input_file_name = os.path.splitext(os.path.basename(video_path))[0]
