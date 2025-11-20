@@ -365,7 +365,9 @@ def CreateSamuraiNode():
 
     s.addKnob(nuke.Text_Knob(' ', ''))
     
-    s.addKnob(nuke.Enumeration_Knob('FileType', 'File type', ['png', 'exr', 'mp4']))
+    file_type_knob = nuke.Enumeration_Knob('FileType', 'File type', ['png', 'exr', 'mp4'])
+    file_type_knob.setTooltip('PNG: Always works (recommended)\nEXR: Requires OpenCV with EXR support (may fallback to PNG)\nMP4: Not yet implemented')
+    s.addKnob(file_type_knob)
     s.addKnob(nuke.File_Knob('OutputPath', 'Output Path'))
     s.addKnob(nuke.PyScript_Knob('GenerateMask', 'Generate Mask', 'GenerateMask()'))
     

@@ -117,6 +117,10 @@ try:
     total_frames = frame_range[1] - frame_range[0] + 1
     color = [(255, 255, 255)]
     
+    # Track actual output format (may fallback to PNG)
+    actual_output_path = output_path
+    used_png_fallback = False
+    
     for frame_idx, object_ids, masks in predictor.propagate_in_video(state):
         progress = int(((frame_count - frame_range[0]) / total_frames) * 100)
         print(f"PROGRESS:{progress}")  # Для парсинга
@@ -155,13 +159,23 @@ try:
             if not success and file_ext.lower() == '.exr':
                 # EXR failed, fallback to PNG
                 save_path_png = save_path.replace('.exr', '.png').replace('.EXR', '.png')
-                print(f"[SAM2 Worker] WARNING: EXR save failed for frame {frame_count}, using PNG")
+                if not used_png_fallback:
+                    # Update actual output path on first fallback
+                    actual_output_path = output_path.replace('.exr', '.png').replace('.EXR', '.png')
+                    used_png_fallback = True
+                    print(f"[SAM2 Worker] WARNING: EXR not supported by OpenCV, using PNG")
+                    print(f"[SAM2 Worker] Output format changed: {actual_output_path}")
                 cv2.imwrite(save_path_png, mask_img)
         except Exception as e:
             # If saving failed, try PNG
             if file_ext.lower() != '.png':
                 save_path_png = os.path.splitext(save_path)[0] + '.png'
-                print(f"[SAM2 Worker] WARNING: {file_ext} save failed ({e}), using PNG")
+                if not used_png_fallback:
+                    # Update actual output path on first fallback
+                    actual_output_path = os.path.splitext(output_path)[0] + '.png'
+                    used_png_fallback = True
+                    print(f"[SAM2 Worker] WARNING: {file_ext} save failed, using PNG")
+                    print(f"[SAM2 Worker] Output format changed: {actual_output_path}")
                 cv2.imwrite(save_path_png, mask_img)
         
         frame_count += 1
@@ -169,7 +183,9 @@ try:
     print(f"PROGRESS:100")
     print("STAGE:Saving Complete!")
     print(f"[SAM2 Worker] All masks saved successfully!")
-    print(f"OUTPUT_PATH:{output_path}")  # Для создания Read node в Nuke
+    if used_png_fallback:
+        print(f"[SAM2 Worker] NOTE: Used PNG format (EXR not supported)")
+    print(f"OUTPUT_PATH:{actual_output_path}")  # Для создания Read node в Nuke
     sys.exit(0)
     
 except Exception as e:
