@@ -3,7 +3,7 @@
 # IMPORTANT: This file is for SYSTEM PYTHON packages (for SAM2 inference in subprocess)
 # 
 # Additionally, you need to install opencv-python and numpy in NUKE PYTHON:
-#   "C:\Program Files\Nuke16.0v4\python.exe" -m pip install opencv-python numpy
+#   "C:\Program Files\Nuke16.0v4\python.exe" -m pip install --force-reinstall opencv-python>=4.8.0 numpy>=1.26.0
 # 
 # Why two installations?
 #   - System Python: torch, SAM2 dependencies (for mask generation via subprocess)

@@ -215,27 +215,39 @@ pip install -r requirements.txt
 
 ## Шаг 3.2: Ручная Установка (если requirements.txt недоступен)
 
-**Установите ВСЕ зависимости одной командой:**
+**Установите ВСЕ зависимости одной командой с точными версиями:**
 ```cmd
-pip install numpy opencv-python Pillow tqdm hydra-core omegaconf iopath timm einops loguru
+pip install numpy>=1.26.0 opencv-python>=4.8.0 Pillow>=10.0.0 hydra-core>=1.3.0 omegaconf>=2.3.0 iopath>=0.1.10 timm>=0.9.0 tqdm>=4.65.0 einops>=0.7.0 loguru>=0.7.0
 ```
 
-**Или по отдельности:**
+**Или по отдельности с версиями:**
+
+### NumPy:
+```cmd
+pip install numpy>=1.26.0
+```
 
 ### OpenCV:
 ```cmd
-pip install opencv-python
+pip install opencv-python>=4.8.0
 ```
 
-### Остальные пакеты:
+### Pillow:
 ```cmd
-pip install Pillow hydra-core omegaconf iopath timm einops tqdm loguru
+pip install Pillow>=10.0.0
 ```
 
-### NumPy (если ещё не установлен):
+### SAM2 зависимости:
 ```cmd
-pip install numpy
+pip install hydra-core>=1.3.0
+pip install omegaconf>=2.3.0
+pip install iopath>=0.1.10
+pip install timm>=0.9.0
+pip install tqdm>=4.65.0
+pip install einops>=0.7.0
+pip install loguru>=0.7.0
 ```
+
 💡 **Примечание:** NumPy 1.x и 2.x работают одинаково хорошо в subprocess! Subprocess архитектура изолирует нас от проблем совместимости Nuke.
 
 ---
@@ -357,12 +369,12 @@ dir "C:\Program Files\Nuke16.0v4\python.exe"
 
 **Для Nuke 16.0v4:**
 ```cmd
-"C:\Program Files\Nuke16.0v4\python.exe" -m pip install --force-reinstall opencv-python numpy
+"C:\Program Files\Nuke16.0v4\python.exe" -m pip install --force-reinstall opencv-python>=4.8.0 numpy>=1.26.0
 ```
 
 **Для Nuke 15.1v5:**
 ```cmd
-"C:\Program Files\Nuke15.1v5\python.exe" -m pip install --force-reinstall opencv-python numpy
+"C:\Program Files\Nuke15.1v5\python.exe" -m pip install --force-reinstall opencv-python>=4.8.0 numpy>=1.26.0
 ```
 
 💡 **`--force-reinstall`** гарантирует установку именно в Nuke Python!
@@ -406,7 +418,7 @@ Path: C:\Program Files\Nuke15.1v5\lib\site-packages\cv2\__init__.py
 
 2. Переустановите с `--force-reinstall`:
 ```cmd
-"C:\Program Files\Nuke15.1v5\python.exe" -m pip install --force-reinstall opencv-python numpy
+"C:\Program Files\Nuke15.1v5\python.exe" -m pip install --force-reinstall opencv-python>=4.8.0 numpy>=1.26.0
 ```
 
 3. Проверьте снова

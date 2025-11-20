@@ -157,9 +157,23 @@ cd %USERPROFILE%\.nuke\NukeSamurai
 pip install -r requirements.txt
 ```
 
-**Вариант 2: Ручная установка**
+**Вариант 2: Ручная установка с точными версиями**
 ```bash
-pip install numpy opencv-python pillow tqdm hydra-core omegaconf iopath timm einops loguru
+pip install numpy>=1.26.0 opencv-python>=4.8.0 Pillow>=10.0.0 hydra-core>=1.3.0 omegaconf>=2.3.0 iopath>=0.1.10 timm>=0.9.0 tqdm>=4.65.0 einops>=0.7.0 loguru>=0.7.0
+```
+
+**Или по одному:**
+```bash
+pip install numpy>=1.26.0
+pip install opencv-python>=4.8.0
+pip install Pillow>=10.0.0
+pip install hydra-core>=1.3.0
+pip install omegaconf>=2.3.0
+pip install iopath>=0.1.10
+pip install timm>=0.9.0
+pip install tqdm>=4.65.0
+pip install einops>=0.7.0
+pip install loguru>=0.7.0
 ```
 
 ⚠️ **Важно:** Все зависимости должны быть установлены в system Python, где установлен PyTorch!
@@ -172,12 +186,12 @@ pip install numpy opencv-python pillow tqdm hydra-core omegaconf iopath timm ein
 
 Для Nuke 16.0v4:
 ```bash
-"C:\Program Files\Nuke16.0v4\python.exe" -m pip install --force-reinstall opencv-python numpy
+"C:\Program Files\Nuke16.0v4\python.exe" -m pip install --force-reinstall opencv-python>=4.8.0 numpy>=1.26.0
 ```
 
 Для Nuke 15.1:
 ```bash
-"C:\Program Files\Nuke15.1v5\python.exe" -m pip install --force-reinstall opencv-python numpy
+"C:\Program Files\Nuke15.1v5\python.exe" -m pip install --force-reinstall opencv-python>=4.8.0 numpy>=1.26.0
 ```
 
 💡 **`--force-reinstall`** гарантирует установку именно в Nuke Python, а не в system Python!
@@ -333,10 +347,10 @@ nuke.pluginAddPath('./NukeSamurai')
 
 ```bash
 # Для Nuke 16.0v4:
-"C:\Program Files\Nuke16.0v4\python.exe" -m pip install --force-reinstall opencv-python numpy
+"C:\Program Files\Nuke16.0v4\python.exe" -m pip install --force-reinstall opencv-python>=4.8.0 numpy>=1.26.0
 
 # Для Nuke 15.1:
-"C:\Program Files\Nuke15.1v5\python.exe" -m pip install --force-reinstall opencv-python numpy
+"C:\Program Files\Nuke15.1v5\python.exe" -m pip install --force-reinstall opencv-python>=4.8.0 numpy>=1.26.0
 ```
 
 2. Проверьте что cv2 установлен в правильное место:
