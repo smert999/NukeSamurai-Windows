@@ -150,6 +150,11 @@ pip list | findstr "opencv numpy pillow tqdm hydra loguru timm einops"
 
 ⚠️ **КРИТИЧЕСКИ ВАЖНО:** Для работы "Create Bounding Box" нужен opencv-python в **Nuke Python**!
 
+🚨 **СНАЧАЛА проверьте ВАШУ версию Nuke:**
+```cmd
+dir "C:\Program Files" | findstr Nuke
+```
+
 **Откройте CMD/PowerShell как Администратор:**
 
 Для Nuke 16.0v4:
@@ -157,10 +162,12 @@ pip list | findstr "opencv numpy pillow tqdm hydra loguru timm einops"
 "C:\Program Files\Nuke16.0v4\python.exe" -m pip install --force-reinstall opencv-python>=4.8.0 numpy>=1.26.0
 ```
 
-Для Nuke 15.1:
+Для Nuke 15.1v5:
 ```cmd
 "C:\Program Files\Nuke15.1v5\python.exe" -m pip install --force-reinstall opencv-python>=4.8.0 numpy>=1.26.0
 ```
+
+⚠️ **Замените версию на ВАШУ!** Если видите ошибку "файл не найден" - проверьте версию заново!
 
 💡 **`--force-reinstall`** гарантирует установку именно в Nuke Python!
 

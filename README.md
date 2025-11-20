@@ -188,6 +188,11 @@ pip install loguru>=0.7.0
 
 ⚠️ **КРИТИЧЕСКИ ВАЖНО:** Для работы "Create Bounding Box" нужен opencv-python в **Nuke Python**!
 
+🚨 **СНАЧАЛА проверьте ВАШУ версию Nuke:**
+```bash
+dir "C:\Program Files" | findstr Nuke
+```
+
 **Откройте PowerShell/CMD как Администратор:**
 
 Для Nuke 16.0v4:
@@ -195,10 +200,12 @@ pip install loguru>=0.7.0
 "C:\Program Files\Nuke16.0v4\python.exe" -m pip install --force-reinstall opencv-python>=4.8.0 numpy>=1.26.0
 ```
 
-Для Nuke 15.1:
+Для Nuke 15.1v5:
 ```bash
 "C:\Program Files\Nuke15.1v5\python.exe" -m pip install --force-reinstall opencv-python>=4.8.0 numpy>=1.26.0
 ```
+
+⚠️ **Замените версию на ВАШУ!** Если видите ошибку "файл не найден" - проверьте версию заново!
 
 💡 **`--force-reinstall`** гарантирует установку именно в Nuke Python, а не в system Python!
 

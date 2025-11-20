@@ -374,18 +374,36 @@ python check_dependencies.py
 
 ## Шаг 3.5.1: Найдите python.exe от Nuke
 
+🚨 **ВАЖНО: Сначала найдите ВАШУ версию Nuke!**
+
+**Узнайте какие версии Nuke установлены:**
+```cmd
+dir "C:\Program Files" | findstr Nuke
+```
+
+Вывод покажет:
+```
+Nuke15.1v5
+Nuke16.0v4
+```
+
 Путь к python.exe зависит от версии Nuke:
 
 | Версия Nuke | Python | Путь |
 |-------------|--------|------|
 | Nuke 16.0v4 | Python 3.11 | `C:\Program Files\Nuke16.0v4\python.exe` |
 | Nuke 15.1v5 | Python 3.9 | `C:\Program Files\Nuke15.1v5\python.exe` |
+| Nuke 15.1v10 | Python 3.9 | `C:\Program Files\Nuke15.1v10\python.exe` |
 | Nuke 15.0 | Python 3.9 | `C:\Program Files\Nuke15.0\python.exe` |
 
-**Проверьте что файл существует:**
+⚠️ **НЕ копируйте путь вслепую!** Используйте ВАШУ версию из вывода команды выше!
+
+**Проверьте что файл существует (замените на ВАШУ версию!):**
 ```cmd
 dir "C:\Program Files\Nuke16.0v4\python.exe"
 ```
+
+Если видите "Не удается найти указанный файл" - **СТОП!** Проверьте версию заново!
 
 ---
 
@@ -397,6 +415,8 @@ dir "C:\Program Files\Nuke16.0v4\python.exe"
 - Win+X → "Windows PowerShell (Admin)"
 - или Win+X → "Command Prompt (Admin)"
 
+🚨 **ВНИМАНИЕ: Используйте ВАШУ версию Nuke из Шага 3.5.1!**
+
 **Для Nuke 16.0v4:**
 ```cmd
 "C:\Program Files\Nuke16.0v4\python.exe" -m pip install --force-reinstall opencv-python>=4.8.0 numpy>=1.26.0
@@ -406,6 +426,15 @@ dir "C:\Program Files\Nuke16.0v4\python.exe"
 ```cmd
 "C:\Program Files\Nuke15.1v5\python.exe" -m pip install --force-reinstall opencv-python>=4.8.0 numpy>=1.26.0
 ```
+
+**Для Nuke 15.1v10:**
+```cmd
+"C:\Program Files\Nuke15.1v10\python.exe" -m pip install --force-reinstall opencv-python>=4.8.0 numpy>=1.26.0
+```
+
+⚠️ **Если видите ошибку "Не удается найти указанный файл":**
+- СТОП! Вы указали НЕПРАВИЛЬНУЮ версию!
+- Вернитесь к Шагу 3.5.1 и проверьте ВАШУ версию Nuke!
 
 💡 **`--force-reinstall`** гарантирует установку именно в Nuke Python!
 
