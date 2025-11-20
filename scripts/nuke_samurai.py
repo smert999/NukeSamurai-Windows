@@ -232,7 +232,15 @@ def GenerateMask():
                 line = line.strip()
                 nuke.tprint(line)
                 
-                # Parse progress
+                # Parse stage (current step)
+                if line.startswith("STAGE:"):
+                    try:
+                        stage_name = line.split(":", 1)[1]
+                        renderProgress.setMessage(stage_name)
+                    except:
+                        pass
+                
+                # Parse progress (percentage)
                 if line.startswith("PROGRESS:"):
                     try:
                         progress = int(line.split(":")[1])
@@ -259,13 +267,15 @@ def GenerateMask():
                         # Worker saves as PNG (OpenCV doesn't support EXR on Windows)
                         output_path_png = video_output_path.replace('.exr', '.png')
                         
-                        # Check if it's image sequence (has #### or ###)
-                        if "####" in output_path_png or "###" in output_path_png:
+                        # Check if it's image sequence (supports %04d, %03d, ####, ###)
+                        is_sequence = any(pattern in output_path_png for pattern in ["%04d", "%03d", "####", "###"])
+                        
+                        if is_sequence:
                             read_node = nuke.nodes.Read(file=output_path_png)
                             read_node.setXYpos(node_x + 200, node_y)
                             nuke.tprint(f"[SAMURAI] ✅ Read node created: {output_path_png}")
                         else:
-                            nuke.tprint(f"[SAMURAI] ⚠️ Read node not created: output must be image sequence")
+                            nuke.tprint(f"[SAMURAI] ⚠️ Read node not created: output must be image sequence (use %04d or ####)")
                     except Exception as e:
                         nuke.tprint(f"[SAMURAI] ⚠️ Could not create Read node: {e}")
                 

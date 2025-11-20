@@ -57,14 +57,18 @@ try:
     model_cfg = determine_model_cfg(model_path)
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
     
+    # STAGE 1: Model Loading
+    print("STAGE:Loading Model...")
     print(f"[SAM2 Worker] Loading model: {model_path}")
     print(f"[SAM2 Worker] Device: {device}")
     
     predictor = build_sam2_video_predictor(model_cfg, model_path, device=device)
+    print("STAGE:Initializing Video...")
     
     # Инициализация
     autocast_context = torch.autocast("cuda", dtype=torch.float16) if torch.cuda.is_available() else torch.autocast("cpu", enabled=False)
     
+    print("STAGE:Reading Frames...")
     with torch.inference_mode(), autocast_context:
         state, images, frame_start = predictor.init_state(
             video_path,
@@ -76,6 +80,7 @@ try:
             bits=bits
         )
         
+        print("STAGE:Detecting Object...")
         _, _, masks = predictor.add_new_points_or_box(state, box=bbox, frame_idx=0, obj_id=0)
     
     # Получаем размеры изображения
@@ -97,17 +102,20 @@ try:
     output_basename = os.path.splitext(os.path.basename(output_path))[0]
     
     # Propagation
+    print("STAGE:Propagating Masks...")
     print(f"[SAM2 Worker] Starting propagation...")
     print(f"PROGRESS:0")  # Для парсинга Nuke
     
     frame_count = frame_range[0]
-    total_frames = frame_range[1] - frame_range[0]
+    total_frames = frame_range[1] - frame_range[0] + 1
     color = [(255, 255, 255)]
     
     for frame_idx, object_ids, masks in predictor.propagate_in_video(state):
-        progress = int((frame_count - frame_range[0]) / total_frames * 100)
+        progress = int(((frame_count - frame_range[0]) / total_frames) * 100)
         print(f"PROGRESS:{progress}")  # Для парсинга
-        print(f"[SAM2 Worker] Frame {frame_count}/{frame_range[1]}")
+        # Детальная информация о текущем кадре
+        print(f"STAGE:Frame {frame_count}/{frame_range[1]} ({progress}%)")
+        print(f"[SAM2 Worker] Processing frame {frame_count}/{frame_range[1]}")
         
         # Обработка масок
         mask_to_vis = {}
@@ -135,7 +143,8 @@ try:
         frame_count += 1
     
     print(f"PROGRESS:100")
-    print(f"[SAM2 Worker] Completed!")
+    print("STAGE:Saving Complete!")
+    print(f"[SAM2 Worker] All masks saved successfully!")
     # Заменяем .exr на .png для Read node
     output_path_png = output_path.replace('.exr', '.png')
     print(f"OUTPUT_PATH:{output_path_png}")  # Для создания Read node в Nuke
