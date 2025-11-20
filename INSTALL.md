@@ -131,18 +131,22 @@ pip list | findstr "opencv numpy pillow tqdm hydra loguru timm einops"
 
 Для Nuke 16.0v4:
 ```cmd
-"C:\Program Files\Nuke16.0v4\python.exe" -m pip install opencv-python numpy
+"C:\Program Files\Nuke16.0v4\python.exe" -m pip install --force-reinstall opencv-python numpy
 ```
 
 Для Nuke 15.1:
 ```cmd
-"C:\Program Files\Nuke15.1v5\python.exe" -m pip install opencv-python numpy
+"C:\Program Files\Nuke15.1v5\python.exe" -m pip install --force-reinstall opencv-python numpy
 ```
 
-**Проверка:**
+💡 **`--force-reinstall`** гарантирует установку именно в Nuke Python!
+
+**Проверка (ВАЖНО!):**
 ```cmd
-"C:\Program Files\Nuke16.0v4\python.exe" -c "import cv2; print(cv2.__version__)"
+"C:\Program Files\Nuke15.1v5\python.exe" -c "import cv2; print('Path:', cv2.__file__)"
 ```
+
+⚠️ Путь ДОЛЖЕН содержать `Nuke15.1v5\lib\site-packages`, **НЕ** `AppData\Roaming\Python\Python310`!
 
 ---
 

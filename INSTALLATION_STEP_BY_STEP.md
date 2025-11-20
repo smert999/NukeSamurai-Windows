@@ -323,13 +323,15 @@ dir "C:\Program Files\Nuke16.0v4\python.exe"
 
 **Для Nuke 16.0v4:**
 ```cmd
-"C:\Program Files\Nuke16.0v4\python.exe" -m pip install opencv-python numpy
+"C:\Program Files\Nuke16.0v4\python.exe" -m pip install --force-reinstall opencv-python numpy
 ```
 
 **Для Nuke 15.1v5:**
 ```cmd
-"C:\Program Files\Nuke15.1v5\python.exe" -m pip install opencv-python numpy
+"C:\Program Files\Nuke15.1v5\python.exe" -m pip install --force-reinstall opencv-python numpy
 ```
+
+💡 **`--force-reinstall`** гарантирует установку именно в Nuke Python!
 
 **Ожидаемый вывод:**
 ```
@@ -345,15 +347,35 @@ Successfully installed numpy-1.26.4 opencv-python-4.10.0.84
 
 ## Шаг 3.5.3: Проверка Установки
 
-**Для Nuke 16.0v4:**
+**Для Nuke 15.1v5:**
 ```cmd
-"C:\Program Files\Nuke16.0v4\python.exe" -c "import cv2; print('OpenCV:', cv2.__version__)"
+"C:\Program Files\Nuke15.1v5\python.exe" -c "import cv2; print('OpenCV:', cv2.__version__, '\nPath:', cv2.__file__)"
 ```
 
 **Должно показать:**
 ```
 OpenCV: 4.10.0
+Path: C:\Program Files\Nuke15.1v5\lib\site-packages\cv2\__init__.py
 ```
+
+⚠️ **КРИТИЧЕСКИ ВАЖНО:** Путь ДОЛЖЕН содержать `Nuke15.1v5\lib\site-packages`!
+
+**Если путь показывает `AppData\Roaming\Python\Python310`:**
+
+Это значит что Nuke импортирует cv2 из system Python (неправильно)!
+
+**Решение:**
+1. Очистите переменную окружения PYTHONPATH:
+```powershell
+[Environment]::SetEnvironmentVariable("PYTHONPATH", $null, "User")
+```
+
+2. Переустановите с `--force-reinstall`:
+```cmd
+"C:\Program Files\Nuke15.1v5\python.exe" -m pip install --force-reinstall opencv-python numpy
+```
+
+3. Проверьте снова
 
 **Если ошибка:**
 - Проверьте что запускали cmd/PowerShell **КАК АДМИНИСТРАТОР**

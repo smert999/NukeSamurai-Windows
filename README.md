@@ -111,18 +111,26 @@ pip install numpy opencv-python pillow tqdm hydra-core omegaconf iopath timm ein
 
 Для Nuke 16.0v4:
 ```bash
-"C:\Program Files\Nuke16.0v4\python.exe" -m pip install opencv-python numpy
+"C:\Program Files\Nuke16.0v4\python.exe" -m pip install --force-reinstall opencv-python numpy
 ```
 
 Для Nuke 15.1:
 ```bash
-"C:\Program Files\Nuke15.1v5\python.exe" -m pip install opencv-python numpy
+"C:\Program Files\Nuke15.1v5\python.exe" -m pip install --force-reinstall opencv-python numpy
 ```
 
-**Проверка:**
+💡 **`--force-reinstall`** гарантирует установку именно в Nuke Python, а не в system Python!
+
+**Проверка (ВАЖНО!):**
 ```bash
-"C:\Program Files\Nuke16.0v4\python.exe" -c "import cv2; print('OpenCV:', cv2.__version__)"
+"C:\Program Files\Nuke15.1v5\python.exe" -c "import cv2; print('OpenCV:', cv2.__version__, '\nPath:', cv2.__file__)"
 ```
+
+⚠️ Путь ДОЛЖЕН содержать `Nuke15.1v5\lib\site-packages`, **НЕ** `AppData\Roaming\Python\Python310`!
+
+**Если видите путь к Python310:**
+- Очистите переменную окружения PYTHONPATH
+- Переустановите с `--force-reinstall`
 
 ### Шаг 4: Установка плагина
 
@@ -254,18 +262,35 @@ nuke.pluginAddPath('./NukeSamurai')
 
 ### "ModuleNotFoundError: No module named 'numpy'" при Create Bounding Box
 
-**Проблема:** opencv-python и numpy не установлены в **Nuke Python**.
+**Проблема:** opencv-python и numpy не установлены в **Nuke Python**, или Nuke импортирует cv2 из system Python.
 
 **Важно:** Функция "Create Bounding Box" использует cv2.selectROI(), которая выполняется в Nuke Python, а не в subprocess!
 
-**Решение:** Установите opencv-python и numpy В NUKE PYTHON:
+**Решение:** 
+
+1. Установите opencv-python и numpy В NUKE PYTHON с `--force-reinstall`:
 
 ```bash
 # Для Nuke 16.0v4:
-"C:\Program Files\Nuke16.0v4\python.exe" -m pip install opencv-python numpy
+"C:\Program Files\Nuke16.0v4\python.exe" -m pip install --force-reinstall opencv-python numpy
 
 # Для Nuke 15.1:
-"C:\Program Files\Nuke15.1v5\python.exe" -m pip install opencv-python numpy
+"C:\Program Files\Nuke15.1v5\python.exe" -m pip install --force-reinstall opencv-python numpy
+```
+
+2. Проверьте что cv2 установлен в правильное место:
+
+```bash
+"C:\Program Files\Nuke15.1v5\python.exe" -c "import cv2; print(cv2.__file__)"
+```
+
+**Должно быть:** `C:\Program Files\Nuke15.1v5\lib\site-packages\cv2\...`  
+**НЕ должно быть:** `C:\Users\...\AppData\Roaming\Python\Python310\...`
+
+3. Если путь неправильный - очистите PYTHONPATH:
+
+```powershell
+[Environment]::SetEnvironmentVariable("PYTHONPATH", $null, "User")
 ```
 
 ⚠️ Требуются права администратора!
