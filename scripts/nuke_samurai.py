@@ -1,4 +1,3 @@
-import cv2
 import nuke
 import os
 import threading
@@ -6,8 +5,8 @@ import gc
 import subprocess
 import json
 
-# NO torch import - using subprocess with system Python instead!
-# System Python has working torch with CUDA
+# NO torch or cv2 imports - using subprocess with system Python instead!
+# cv2 is imported locally in getBbox() function
 
 nuke.tprint('Current thread : ' +str(threading.current_thread().name) )
 
@@ -23,6 +22,9 @@ class BoundingBox :
 
     @classmethod
     def getBbox(cls):
+        # Import cv2 locally (not available in Nuke Python by default)
+        import cv2
+        
         file_path = InputInfos.path
         
         # Check if file path is set
@@ -188,22 +190,12 @@ def GenerateMask():
     worker_script = os.path.join(script_dir, "sam2_worker.py")
     sam2_repo = os.path.join(os.path.dirname(script_dir), "sam2_repo")
     
-    # Calculate relative frame index (0-based from start of range)
-    reference_frame = int(nuke.thisNode().knob('ReferenceFrame').value())
-    reference_frame_idx = reference_frame - int(frame_min)
-    
-    # Validate reference frame is within range
-    if reference_frame < int(frame_min) or reference_frame > int(frame_max):
-        nuke.message(f"⚠️ Ошибка!\n\nReference Frame ({reference_frame}) должен быть в пределах Frame Range ({int(frame_min)} - {int(frame_max)})")
-        return
-    
     # Prepare parameters
     params = {
         "video_path": video_path,
         "output_path": video_output_path,
         "bbox_coord": list(bbox_coord),
         "frame_range": frame_range,
-        "reference_frame_idx": reference_frame_idx,
         "model_path": model_path,
         "fps_original": original_fps,
         "fps_target": target_fps,

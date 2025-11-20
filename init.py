@@ -6,6 +6,9 @@ import nuke
 # Plugin uses subprocess with system Python for GPU inference
 # No torch imports in Nuke Python - keeps it clean and simple!
 
+# Enable OpenEXR support in OpenCV (if user has it compiled with OpenEXR)
+os.environ['OPENCV_IO_ENABLE_OPENEXR'] = '1'
+
 plugin_path = os.path.dirname(__file__)
 
 # Add icons
