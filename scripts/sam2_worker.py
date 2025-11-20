@@ -28,13 +28,20 @@ print(f"[SAM2 Worker] torch {torch.__version__}, CUDA: {torch.cuda.is_available(
 
 # Извлекаем параметры
 video_path = params["video_path"]
-output_path = params["output_path"].replace('.exr', '.png')  # OpenCV не поддерживает EXR, используем PNG
+output_path = params["output_path"]
 bbox_coord = params["bbox_coord"]
 frame_range = params["frame_range"]
 model_path = os.path.join(params["sam2_repo"], params["model_path"])  # checkpoints inside sam2_repo!
 fps_original = params["fps_original"]
 fps_target = params["fps_target"]
 bits = params["bits"]
+
+# Check if output is EXR - OpenCV needs special compilation for EXR support
+is_exr_output = output_path.lower().endswith('.exr') or '.exr' in output_path.lower()
+if is_exr_output:
+    print("[SAM2 Worker] WARNING: EXR output requested")
+    print("[SAM2 Worker] OpenCV pip version doesn't support EXR by default")
+    print("[SAM2 Worker] Trying to save as EXR (requires OPENCV_IO_ENABLE_OPENEXR=1)")
 
 # Определяем конфигурацию модели
 def determine_model_cfg(model_path):
@@ -129,25 +136,40 @@ try:
         for obj_id, mask in mask_to_vis.items():
             mask_img[mask] = color[(obj_id + 1) % len(color)]
         
-        # Сохранение (PNG вместо EXR - OpenCV не поддерживает EXR в Windows wheels)
-        if "%04d" in output_basename:
-            save_path = os.path.join(output_dir, output_basename.replace('%04d', f"{frame_count:04}") + ".png")
-        elif "%03d" in output_basename:
-            save_path = os.path.join(output_dir, output_basename.replace('%03d', f"{frame_count:03}") + ".png")
-        else:
-            save_path = os.path.join(output_dir, f"{output_basename}_{frame_count:04}.png")
+        # Determine file extension from output_path
+        file_ext = os.path.splitext(output_path)[1]  # .png or .exr
+        if not file_ext:
+            file_ext = ".png"  # default to PNG
         
-        # Сохраняем PNG (8-bit достаточно для масок 0/255)
-        cv2.imwrite(save_path, mask_img)
+        # Build save path with correct extension
+        if "%04d" in output_basename:
+            save_path = os.path.join(output_dir, output_basename.replace('%04d', f"{frame_count:04}") + file_ext)
+        elif "%03d" in output_basename:
+            save_path = os.path.join(output_dir, output_basename.replace('%03d', f"{frame_count:03}") + file_ext)
+        else:
+            save_path = os.path.join(output_dir, f"{output_basename}_{frame_count:04}{file_ext}")
+        
+        # Try to save in requested format
+        try:
+            success = cv2.imwrite(save_path, mask_img)
+            if not success and file_ext.lower() == '.exr':
+                # EXR failed, fallback to PNG
+                save_path_png = save_path.replace('.exr', '.png').replace('.EXR', '.png')
+                print(f"[SAM2 Worker] WARNING: EXR save failed for frame {frame_count}, using PNG")
+                cv2.imwrite(save_path_png, mask_img)
+        except Exception as e:
+            # If saving failed, try PNG
+            if file_ext.lower() != '.png':
+                save_path_png = os.path.splitext(save_path)[0] + '.png'
+                print(f"[SAM2 Worker] WARNING: {file_ext} save failed ({e}), using PNG")
+                cv2.imwrite(save_path_png, mask_img)
         
         frame_count += 1
     
     print(f"PROGRESS:100")
     print("STAGE:Saving Complete!")
     print(f"[SAM2 Worker] All masks saved successfully!")
-    # Заменяем .exr на .png для Read node
-    output_path_png = output_path.replace('.exr', '.png')
-    print(f"OUTPUT_PATH:{output_path_png}")  # Для создания Read node в Nuke
+    print(f"OUTPUT_PATH:{output_path}")  # Для создания Read node в Nuke
     sys.exit(0)
     
 except Exception as e:

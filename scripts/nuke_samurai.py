@@ -263,41 +263,41 @@ def GenerateMask():
             if process.returncode == 0:
                 nuke.tprint("[SAMURAI] ✅ Masks generated successfully!")
                 
+                # Capture frame range NOW (before executeInMainThread)
+                captured_frame_min = int(frame_min)
+                captured_frame_max = int(frame_max)
+                captured_output_path = str(video_output_path)
+                
                 # Create Read node for masks in main thread
                 def create_read_node():
                     try:
-                        # Worker saves as PNG (OpenCV doesn't support EXR on Windows)
-                        output_path_png = video_output_path.replace('.exr', '.png')
+                        # Use captured values (not nuke.thisNode() which doesn't work here)
+                        output_path_final = captured_output_path
                         
                         # Check if it's image sequence (supports %04d, %03d, ####, ###)
-                        is_sequence = any(pattern in output_path_png for pattern in ["%04d", "%03d", "####", "###"])
+                        is_sequence = any(pattern in output_path_final for pattern in ["%04d", "%03d", "####", "###"])
                         
                         if is_sequence:
-                            # Get current node for frame range
-                            current_node = nuke.thisNode()
-                            frame_min = int(current_node.knob('FrameRangeMin').value())
-                            frame_max = int(current_node.knob('FrameRangeMax').value())
-                            
                             # Verify first frame exists
-                            first_frame_path = output_path_png
-                            if "%04d" in output_path_png:
-                                first_frame_path = output_path_png.replace('%04d', f"{frame_min:04}")
-                            elif "%03d" in output_path_png:
-                                first_frame_path = output_path_png.replace('%03d', f"{frame_min:03}")
+                            first_frame_path = output_path_final
+                            if "%04d" in output_path_final:
+                                first_frame_path = output_path_final.replace('%04d', f"{captured_frame_min:04}")
+                            elif "%03d" in output_path_final:
+                                first_frame_path = output_path_final.replace('%03d', f"{captured_frame_min:03}")
                             
                             if not os.path.exists(first_frame_path):
                                 nuke.tprint(f"[SAMURAI] ⚠️ First frame not found: {first_frame_path}")
-                                nuke.tprint(f"[SAMURAI] ℹ️  Masks path: {output_path_png}")
+                                nuke.tprint(f"[SAMURAI] ℹ️  Masks path: {output_path_final}")
                                 return
                             
                             # Create Read node with proper settings
-                            read_node = nuke.nodes.Read(file=output_path_png)
+                            read_node = nuke.nodes.Read(file=output_path_final)
                             
                             # Set frame range
-                            read_node['first'].setValue(frame_min)
-                            read_node['last'].setValue(frame_max)
-                            read_node['origfirst'].setValue(frame_min)
-                            read_node['origlast'].setValue(frame_max)
+                            read_node['first'].setValue(captured_frame_min)
+                            read_node['last'].setValue(captured_frame_max)
+                            read_node['origfirst'].setValue(captured_frame_min)
+                            read_node['origlast'].setValue(captured_frame_max)
                             
                             # Set colorspace to linear (masks are linear data)
                             try:
@@ -315,8 +315,8 @@ def GenerateMask():
                             # Position node
                             read_node.setXYpos(node_x + 200, node_y)
                             
-                            nuke.tprint(f"[SAMURAI] ✅ Read node created: {output_path_png}")
-                            nuke.tprint(f"[SAMURAI] ℹ️  Frame range: {frame_min}-{frame_max}")
+                            nuke.tprint(f"[SAMURAI] ✅ Read node created: {output_path_final}")
+                            nuke.tprint(f"[SAMURAI] ℹ️  Frame range: {captured_frame_min}-{captured_frame_max}")
                             nuke.tprint(f"[SAMURAI] ℹ️  Colorspace: {read_node['colorspace'].value()}")
                         else:
                             nuke.tprint(f"[SAMURAI] ⚠️ Read node not created: output must be image sequence (use %04d or ####)")
@@ -327,9 +327,8 @@ def GenerateMask():
                 
                 nuke.executeInMainThread(create_read_node)
                 
-                # Show correct output path (PNG instead of EXR)
-                output_path_display = video_output_path.replace('.exr', '.png')
-                nuke.executeInMainThread(nuke.message, args=("✅ Генерация завершена!\n\nМаски сохранены в:\n" + output_path_display + "\n\nRead нода создана справа от узла SAMURAI!",))
+                # Show output path
+                nuke.executeInMainThread(nuke.message, args=("✅ Генерация завершена!\n\nМаски сохранены в:\n" + video_output_path + "\n\nRead нода создана справа от узла SAMURAI!",))
             else:
                 nuke.tprint(f"[SAMURAI] ❌ Worker failed with code {process.returncode}")
                 nuke.executeInMainThread(nuke.message, args=("❌ Ошибка генерации!\n\nПроверьте консоль для деталей",))
