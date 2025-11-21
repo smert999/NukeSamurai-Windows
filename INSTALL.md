@@ -88,13 +88,13 @@ CUDA Version: 12.1
 #### Для CUDA 12.1 (RTX 4090, RTX 4080, RTX 4070 и новее):
 
 ```cmd
-pip install torch==2.5.1+cu121 torchvision==0.20.1+cu121 --index-url https://download.pytorch.org/whl/cu121
+pip install torch==2.5.1 torchvision==0.20.1 --index-url https://download.pytorch.org/whl/cu121
 ```
 
 #### Для CUDA 11.8 (RTX 3090, RTX 3080, RTX 3070):
 
 ```cmd
-pip install torch==2.5.1+cu118 torchvision==0.20.1+cu118 --index-url https://download.pytorch.org/whl/cu118
+pip install torch==2.5.1 torchvision==0.20.1 --index-url https://download.pytorch.org/whl/cu118
 ```
 
 **Проверьте установку**:
@@ -370,13 +370,13 @@ CUDA Version: 12.1
 #### For CUDA 12.1 (RTX 4090, RTX 4080, RTX 4070 and newer):
 
 ```cmd
-pip install torch==2.5.1+cu121 torchvision==0.20.1+cu121 --index-url https://download.pytorch.org/whl/cu121
+pip install torch==2.5.1 torchvision==0.20.1 --index-url https://download.pytorch.org/whl/cu121
 ```
 
 #### For CUDA 11.8 (RTX 3090, RTX 3080, RTX 3070):
 
 ```cmd
-pip install torch==2.5.1+cu118 torchvision==0.20.1+cu118 --index-url https://download.pytorch.org/whl/cu118
+pip install torch==2.5.1 torchvision==0.20.1 --index-url https://download.pytorch.org/whl/cu118
 ```
 
 **Verify installation**:
