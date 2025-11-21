@@ -147,12 +147,12 @@ This plugin uses **subprocess architecture** for complete PyTorch isolation from
 Откройте **командную строку** (cmd) и выполните:
 
 ```bash
-pip install torch==2.5.1 torchvision==0.20.1 --index-url https://download.pytorch.org/whl/cu121
+pip install torch==2.5.1+cu121 torchvision==0.20.1+cu121 --index-url https://download.pytorch.org/whl/cu121
 ```
 
 Или для CUDA 11.8:
 ```bash
-pip install torch==2.5.1 torchvision==0.20.1 --index-url https://download.pytorch.org/whl/cu118
+pip install torch==2.5.1+cu118 torchvision==0.20.1+cu118 --index-url https://download.pytorch.org/whl/cu118
 ```
 
 ### Шаг 3: Установка зависимостей для System Python
