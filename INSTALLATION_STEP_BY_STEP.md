@@ -245,7 +245,7 @@ pip install -e .
 
 **Установите ВСЕ зависимости одной командой с точными версиями:**
 ```cmd
-pip install numpy>=1.26.0 opencv-python>=4.8.0 Pillow>=10.0.0 hydra-core>=1.3.0 omegaconf>=2.3.0 iopath>=0.1.10 timm>=0.9.0 tqdm>=4.65.0 einops>=0.7.0 loguru>=0.7.0
+pip install numpy>=1.26.0 opencv-python>=4.8.0 Pillow>=10.0.0 hydra-core>=1.3.0 omegaconf>=2.3.0 iopath>=0.1.10 timm>=0.9.0 tqdm>=4.65.0 einops>=0.7.0 loguru>=0.7.0 scipy>=1.10.0
 ```
 
 **Или по отдельности с версиями:**
@@ -274,6 +274,7 @@ pip install timm>=0.9.0
 pip install tqdm>=4.65.0
 pip install einops>=0.7.0
 pip install loguru>=0.7.0
+pip install scipy>=1.10.0
 ```
 
 💡 **Примечание:** 
@@ -301,6 +302,7 @@ dependencies = {
     'einops': 'Einops',
     'tqdm': 'tqdm',
     'loguru': 'Loguru',
+    'scipy': 'SciPy',
     'numpy': 'NumPy'
 }
 
