@@ -373,59 +373,105 @@ def GenerateMask():
     params_json = json.dumps(params)
     
     # Find system Python automatically
-    # Method 0: Check environment variable first (for advanced users)
-    system_python = os.getenv('SAMURAI_PYTHON')
+    # Helper function to check if Python version is compatible (3.10, 3.11, 3.12)
+    def is_compatible_python(python_path):
+        try:
+            result = subprocess.run([python_path, '--version'], capture_output=True, text=True, timeout=5)
+            version_output = result.stdout + result.stderr
+            for ver in ['Python 3.10', 'Python 3.11', 'Python 3.12']:
+                if ver in version_output:
+                    return True
+        except:
+            pass
+        return False
     
-    if not system_python or not os.path.exists(system_python):
-        # Method 1: Try 'python' in PATH
+    system_python = None
+    
+    # Method 0: Check environment variable first (for advanced users)
+    env_python = os.getenv('SAMURAI_PYTHON')
+    if env_python and os.path.exists(env_python):
+        system_python = env_python
+    
+    # Method 1: Try 'python' in PATH
+    if not system_python:
         python_cmd = shutil.which('python')
-        if python_cmd:
-            try:
-                # Check if it's Python 3.10 or 3.11
-                result = subprocess.run([python_cmd, '--version'], capture_output=True, text=True, timeout=5)
-                version_output = result.stdout + result.stderr
-                if 'Python 3.10' in version_output or 'Python 3.11' in version_output:
-                    system_python = python_cmd
-            except:
-                pass
-        
-        # Method 2: Try 'python3' in PATH
-        if not system_python:
-            python3_cmd = shutil.which('python3')
-            if python3_cmd:
+        if python_cmd and is_compatible_python(python_cmd):
+            system_python = python_cmd
+    
+    # Method 2: Try 'python3' in PATH
+    if not system_python:
+        python3_cmd = shutil.which('python3')
+        if python3_cmd and is_compatible_python(python3_cmd):
+            system_python = python3_cmd
+    
+    # Method 3: Try Python Launcher (py.exe) - common on Windows
+    if not system_python:
+        py_cmd = shutil.which('py')
+        if py_cmd:
+            # Try to get Python 3.10, 3.11, or 3.12 via py launcher
+            for py_ver in ['-3.12', '-3.11', '-3.10']:
                 try:
-                    result = subprocess.run([python3_cmd, '--version'], capture_output=True, text=True, timeout=5)
-                    version_output = result.stdout + result.stderr
-                    if 'Python 3.10' in version_output or 'Python 3.11' in version_output:
-                        system_python = python3_cmd
+                    result = subprocess.run([py_cmd, py_ver, '-c', 'import sys; print(sys.executable)'], 
+                                          capture_output=True, text=True, timeout=5)
+                    if result.returncode == 0:
+                        found_python = result.stdout.strip()
+                        if found_python and os.path.exists(found_python):
+                            system_python = found_python
+                            break
                 except:
                     pass
-        
-        # Method 3: Try common installation paths
-        if not system_python:
-            username = os.getenv('USERNAME', 'User')
-            common_paths = [
-                rf"C:\Users\{username}\AppData\Local\Programs\Python\Python310\python.exe",
-                rf"C:\Users\{username}\AppData\Local\Programs\Python\Python311\python.exe",
-                r"C:\Python310\python.exe",
-                r"C:\Python311\python.exe",
-                r"C:\Program Files\Python310\python.exe",
-                r"C:\Program Files\Python311\python.exe",
-                r"C:\Program Files (x86)\Python310\python.exe",
-                r"C:\Program Files (x86)\Python311\python.exe",
-            ]
-            for path in common_paths:
-                if os.path.exists(path):
-                    system_python = path
+    
+    # Method 4: Try common installation paths
+    if not system_python:
+        username = os.getenv('USERNAME', 'User')
+        common_paths = [
+            # User-specific installations (most common)
+            rf"C:\Users\{username}\AppData\Local\Programs\Python\Python312\python.exe",
+            rf"C:\Users\{username}\AppData\Local\Programs\Python\Python311\python.exe",
+            rf"C:\Users\{username}\AppData\Local\Programs\Python\Python310\python.exe",
+            # System-wide installations
+            r"C:\Python312\python.exe",
+            r"C:\Python311\python.exe",
+            r"C:\Python310\python.exe",
+            r"C:\Program Files\Python312\python.exe",
+            r"C:\Program Files\Python311\python.exe",
+            r"C:\Program Files\Python310\python.exe",
+            r"C:\Program Files (x86)\Python312\python.exe",
+            r"C:\Program Files (x86)\Python311\python.exe",
+            r"C:\Program Files (x86)\Python310\python.exe",
+        ]
+        for path in common_paths:
+            if os.path.exists(path):
+                system_python = path
+                break
+    
+    # Method 5: Search Windows Registry for Python installations
+    if not system_python:
+        try:
+            import winreg
+            for py_ver in ['3.12', '3.11', '3.10']:
+                for hkey in [winreg.HKEY_CURRENT_USER, winreg.HKEY_LOCAL_MACHINE]:
+                    try:
+                        key_path = rf"SOFTWARE\Python\PythonCore\{py_ver}\InstallPath"
+                        with winreg.OpenKey(hkey, key_path) as key:
+                            install_path = winreg.QueryValue(key, None)
+                            python_exe = os.path.join(install_path, 'python.exe')
+                            if os.path.exists(python_exe):
+                                system_python = python_exe
+                                break
+                    except (FileNotFoundError, OSError):
+                        pass
+                if system_python:
                     break
+        except ImportError:
+            pass
     
     # If still not found, show error
     if not system_python:
-        error_msg = "Python 3.10/3.11 not found!\n\n"
-        error_msg += "Please install Python 3.10 or 3.11 and add it to PATH:\n"
+        error_msg = "Python 3.10/3.11/3.12 not found!\n\n"
+        error_msg += "Please install Python 3.10+ and add it to PATH:\n"
         error_msg += "https://www.python.org/downloads/\n\n"
-        error_msg += "Or set SAMURAI_PYTHON environment variable:\n"
-        error_msg += "set SAMURAI_PYTHON=C:\\Python310\\python.exe"
+        error_msg += "Make sure to check 'Add Python to PATH' during installation."
         nuke.message(error_msg)
         return
     

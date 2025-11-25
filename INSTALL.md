@@ -299,12 +299,18 @@ python -c "import torch"
 
 **Если Worker находит неправильный Python** (например `.\.python.EXE`):
 
-Установите переменную окружения вручную:
+NukeSamurai автоматически ищет Python 3.10/3.11/3.12 в следующих местах:
+- Переменная PATH
+- Python Launcher (py.exe)
+- Стандартные пути установки
+- Реестр Windows
+
+Если автоматический поиск не работает, установите переменную окружения вручную:
 ```cmd
 setx SAMURAI_PYTHON "C:\Users\YourUsername\AppData\Local\Programs\Python\Python310\python.exe"
 ```
 
-Замените `YourUsername` на ваше имя пользователя и путь на ваш путь к Python 3.10.
+Замените `YourUsername` на ваше имя пользователя и путь на ваш путь к Python.
 
 Перезапустите Nuke после установки переменной.
 
@@ -561,12 +567,18 @@ If error - reinstall PyTorch (Step 3).
 
 **If Worker finds wrong Python** (e.g. `.\.python.EXE`):
 
-Set environment variable manually:
+NukeSamurai automatically searches for Python 3.10/3.11/3.12 in:
+- PATH variable
+- Python Launcher (py.exe)
+- Standard installation paths
+- Windows Registry
+
+If automatic detection fails, set environment variable manually:
 ```cmd
 setx SAMURAI_PYTHON "C:\Users\YourUsername\AppData\Local\Programs\Python\Python310\python.exe"
 ```
 
-Replace `YourUsername` with your username and path with your Python 3.10 path.
+Replace `YourUsername` with your username and path with your Python path.
 
 Restart Nuke after setting the variable.
 
