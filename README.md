@@ -1,3 +1,25 @@
+# NukeSamurai-Windows - DEPRECATED
+
+> ## ⚠️ This project has been superseded by NukeOnyxSam3
+>
+> **All new development and updates have moved to the new version:**
+>
+> ### 🚀 [NukeOnyxSam3](https://github.com/smert999/NukeOnyxSam3)
+>
+> NukeOnyxSam3 uses **SAM 3 (Segment Anything Model 3)** - the latest version from Meta AI with significant improvements:
+>
+> - **SAM 3** instead of SAM 2 - better tracking quality and performance
+> - **Direct Nuke Input** - read frames directly from connected Nuke nodes
+> - **Lazy Loading** - instant first frame display
+> - **torch.compile() optimization** - 20-50% faster propagation
+> - **Full Unicode support** - paths with Cyrillic and other characters
+> - **Better memory management** - optimized for 8GB+ VRAM
+>
+> **Please use [NukeOnyxSam3](https://github.com/smert999/NukeOnyxSam3) for all new projects!**
+>
+> This repository (NukeSamurai-Windows) is kept for reference only and will not receive updates.
+
+---
 # NukeSamurai - Windows GPU Edition 🚀
 
 > **SAM 2.1 (Segment Anything Model 2.1)** plugin for **Nuke** with **GPU acceleration** on Windows
